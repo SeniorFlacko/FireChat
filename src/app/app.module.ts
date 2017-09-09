@@ -10,6 +10,9 @@ import { AngularFireAuthModule } from 'angularfire2/auth';
 import { environment } from '../environments/environment';
 import { ChatComponent } from './components/chat/chat.component';
 
+
+import { ChatService } from './services/chat.service';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -23,7 +26,7 @@ import { ChatComponent } from './components/chat/chat.component';
     AngularFireAuthModule,
     AppRoutingModule
   ],
-  providers: [],
+  providers: [ ChatService ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
