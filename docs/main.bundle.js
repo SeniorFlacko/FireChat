@@ -71,7 +71,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/app.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "\n<div class=\"container main-container\">\n  <h1>Fire Chat</h1>\n  \n  <app-login *ngIf=\"!chatService.usuario\">\n\n  </app-login>\n\n  <div *ngIf=\"chatService.usuario\"\n    class=\"chat-window\">\n    <app-chat></app-chat>\n  </div>\n</div>\n\n<!--<ul>\n  <li class=\"text\" *ngFor=\"let chat of chats | async\">\n    {{ chat | json }}\n  </li>\n</ul>-->\n\n<router-outlet></router-outlet>\n"
+module.exports = "\n<div class=\"container main-container\">\n  <h1>Fire Chat</h1>\n  \n  <div class=\"row\" *ngIf=\"chatService.usuario\">\n    <div class=\"col-md-12 text-right\">\n      <button (click)=\"salir()\" class=\"btn btn-outline-danger\">Salir</button>\n    </div>\n  </div>\n\n  <app-login *ngIf=\"!chatService.usuario\">\n\n  </app-login>\n\n  <div *ngIf=\"chatService.usuario\"\n    class=\"chat-window\">\n    <app-chat></app-chat>\n  </div>\n</div>\n\n<!--<ul>\n  <li class=\"text\" *ngFor=\"let chat of chats | async\">\n    {{ chat | json }}\n  </li>\n</ul>-->\n\n<router-outlet></router-outlet>\n"
 
 /***/ }),
 
@@ -97,6 +97,9 @@ var AppComponent = (function () {
     function AppComponent(chatService) {
         this.chatService = chatService;
     }
+    AppComponent.prototype.salir = function () {
+        this.chatService.logout();
+    };
     return AppComponent;
 }());
 AppComponent = __decorate([
@@ -198,7 +201,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/components/chat/chat.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<h3>Chat!</h3>\n<hr>\n\n<div id=\"app-mensajes\" class=\"app-mensajes\">\n  <div *ngFor=\"let chat of chatService.chats | async \" \n       [ngClass]=\"{ 'text-right': chatService.usuario.nombre === chat.nombre }\">\n      <span class=\"badge\" \n        [ngClass]=\"{ 'badge-primary': chatService.usuario.nombre === chat.nombre,\n                     'badge-success': chatService.usuario.nombre != chat.nombre }\">\n        {{ chat.nombre }}</span>\n      <p>\n          {{ chat.mensaje }}\n      </p>\n  </div>\n  <!--<div class=\"text-left\">\n      <span class=\"badge badge-success\">Maria</span>\n      <p>\n          Este es otro mensaje!\n      </p>\n  </div>-->\n</div>\n\n<input [(ngModel)]=\"mensaje\" \n       name=\"mensaje\"\n       (keyup.enter)=\"enviar()\"\n       class=\"form-control\"\n       placeholder=\"mensaje...\" \n       type=\"text\">"
+module.exports = "<h3>Chat!</h3>\n<hr>\n\n<div id=\"app-mensajes\" class=\"app-mensajes\">\n  <div *ngFor=\"let chat of chatService.chats | async \" \n       [ngClass]=\"{ 'text-right': chatService.usuario.uid === chat.uid }\">\n      <span class=\"badge\" \n        [ngClass]=\"{ 'badge-primary': chatService.usuario.uid === chat.uid,\n                     'badge-success': chatService.usuario.uid != chat.uid }\">\n        {{ chat.nombre }}</span>\n      <p>\n          {{ chat.mensaje }}\n      </p>\n  </div>\n  <!--<div class=\"text-left\">\n      <span class=\"badge badge-success\">Maria</span>\n      <p>\n          Este es otro mensaje!\n      </p>\n  </div>-->\n</div>\n\n<input [(ngModel)]=\"mensaje\" \n       name=\"mensaje\"\n       (keyup.enter)=\"enviar()\"\n       class=\"form-control\"\n       placeholder=\"mensaje...\" \n       type=\"text\">"
 
 /***/ }),
 
@@ -364,8 +367,9 @@ var ChatService = (function () {
     }
     ChatService.prototype.agregarMensaje = function (texto) {
         var mensaje = {
-            nombre: "Juan Carlos",
-            mensaje: texto
+            nombre: this.usuario.displayName,
+            mensaje: texto,
+            uid: this.usuario.uid
         };
         return this.chats.push(mensaje);
     };
@@ -380,13 +384,22 @@ var ChatService = (function () {
     };
     ChatService.prototype.login = function (proveedor) {
         var _this = this;
-        this.afAuth.auth.signInWithPopup(new __WEBPACK_IMPORTED_MODULE_3_firebase_app__["auth"].GoogleAuthProvider()).then(function (response) {
+        var provider;
+        if (proveedor == "google") {
+            provider = new __WEBPACK_IMPORTED_MODULE_3_firebase_app__["auth"].GoogleAuthProvider();
+        }
+        else {
+            provider = new __WEBPACK_IMPORTED_MODULE_3_firebase_app__["auth"].TwitterAuthProvider();
+        }
+        this.afAuth.auth.signInWithPopup(provider).then(function (response) {
             _this.usuario = response.user;
             localStorage.setItem('usuario', JSON.stringify(_this.usuario));
         });
     };
     ChatService.prototype.logout = function () {
         this.afAuth.auth.signOut();
+        localStorage.removeItem('usuario');
+        this.usuario = null;
     };
     return ChatService;
 }());
