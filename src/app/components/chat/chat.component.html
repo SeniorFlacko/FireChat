@@ -2,18 +2,22 @@
 <hr>
 
 <div id="app-mensajes" class="app-mensajes">
-  <div class="text-right">
-      <span class="badge badge-primary">Cristian</span>
+  <div *ngFor="let chat of chatService.chats | async " 
+       [ngClass]="{ 'text-right': chatService.usuario.nombre === chat.nombre }">
+      <span class="badge" 
+        [ngClass]="{ 'badge-primary': chatService.usuario.nombre === chat.nombre,
+                     'badge-success': chatService.usuario.nombre != chat.nombre }">
+        {{ chat.nombre }}</span>
       <p>
-          Este es un mensaje de prueba!
+          {{ chat.mensaje }}
       </p>
   </div>
-  <div class="text-left">
+  <!--<div class="text-left">
       <span class="badge badge-success">Maria</span>
       <p>
           Este es otro mensaje!
       </p>
-  </div>
+  </div>-->
 </div>
 
 <input [(ngModel)]="mensaje" 
