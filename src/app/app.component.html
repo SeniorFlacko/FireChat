@@ -2,6 +2,12 @@
 <div class="container main-container">
   <h1>Fire Chat</h1>
   
+  <div class="row" *ngIf="chatService.usuario">
+    <div class="col-md-12 text-right">
+      <button (click)="salir()" class="btn btn-outline-danger">Salir</button>
+    </div>
+  </div>
+
   <app-login *ngIf="!chatService.usuario">
 
   </app-login>

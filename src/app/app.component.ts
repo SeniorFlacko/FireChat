@@ -10,4 +10,8 @@ export class AppComponent {
   constructor( public chatService: ChatService ) {
     
   }
+
+  salir(){
+    this.chatService.logout();
+  }
 }
